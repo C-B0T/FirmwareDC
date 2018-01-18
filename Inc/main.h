@@ -83,6 +83,10 @@
 #define B2_GPIO_Port GPIOB
 #define MS_EN_Pin GPIO_PIN_11
 #define MS_EN_GPIO_Port GPIOA
+#define S_AU_Pin GPIO_PIN_12
+#define S_AU_GPIO_Port GPIOA
+#define LED1_Pin GPIO_PIN_15
+#define LED1_GPIO_Port GPIOA
 #define A2_Pin GPIO_PIN_3
 #define A2_GPIO_Port GPIOB
 #define B1_Pin GPIO_PIN_4
