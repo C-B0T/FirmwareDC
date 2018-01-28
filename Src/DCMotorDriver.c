@@ -44,8 +44,8 @@ static enum Direction direction = FORWARD;
 
 static void SetSpeed (enum Motor motor, float32_t percent);
 static void SetDirection (enum Motor motor, enum Direction direction);
-static void Move (enum Motor motor);
 static void Freewheel (enum Motor motor);
+static void Brake (enum Motor motor);
 
 /*----------------------------------------------------------------------------*/
 /* Implementation                                                             */
@@ -53,46 +53,40 @@ static void Freewheel (enum Motor motor);
 
 void DCMotor_Init ()
 {
-    // Standby
-//  HAL_GPIO_WritePin(STBY_GPIO_Port, STBY_Pin, GPIO_PIN_SET);    // Running
-    
-    // Direction
-//  HAL_GPIO_WritePin(DIR_GPIO_Port, DIR_Pin, GPIO_PIN_SET);    // Forward
+    // Direction : Forward
+    HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_RESET);
+
+    HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
     
     // Power PWM
-    HAL_TIM_PWM_Stop(MOT1_TIMER, MOT1_TIMER_CHANNEL);
-    HAL_TIM_PWM_Stop(MOT2_TIMER, MOT2_TIMER_CHANNEL);
+    HAL_TIM_PWM_Start(MOT1_TIMER, MOT1_TIMER_CHANNEL);
+    __HAL_TIM_SET_COMPARE(MOT1_TIMER, MOT1_TIMER_CHANNEL, 0);
+
+    HAL_TIM_PWM_Start(MOT2_TIMER, MOT2_TIMER_CHANNEL);
+    __HAL_TIM_SET_COMPARE(MOT2_TIMER, MOT2_TIMER_CHANNEL, 0);
 }
 
 void DCMotor_SetMotorSpeed (enum Motor motor, float32_t percent)
 {
     // Limits
     if(percent > 1.0f)
-    {
         percent = 1.0f;
-    }
     else if(percent < -1.0f)
-    {
         percent = -1.0f;
-    }
 
     // Simple speed
-    if(percent > 0.0f)
-    {
+    if(percent > 0.0f) {
         SetDirection(motor, FORWARD);
         SetSpeed(motor, percent);
-        Move(motor);
     }
-    else if(percent < 0.0f)
-    {
+    else if(percent < 0.0f) {
         SetDirection(motor, REVERSE);
         SetSpeed(motor, -percent);
-        Move(motor);
     }
-    else
-    {
+    else {
         SetSpeed(motor, 0.0f);
-        Freewheel(motor);
     }
 }
 
@@ -103,14 +97,8 @@ void DCMotor_Brake(enum Motor motor, float32_t percent)
     else if(percent > 1.0f)
         percent = 1.0f;
 
-    if(motor == MOT1)
-    {
-        //TODO
-    }
-    else if (motor == MOT2)
-    {
-        //TODO
-    }
+    // TODO: percentage braking
+	Brake(motor);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -149,30 +137,25 @@ static void SetDirection (enum Motor motor, enum Direction direction)
 {
     if(motor == MOT1)
     {
-        /*if(direction == FORWARD)
-            HAL_GPIO_WritePin(MOT0_DIR_GPIO_Port,   MOT0_DIR_Pin,   GPIO_PIN_SET);
-        else
-            HAL_GPIO_WritePin(MOT0_DIR_GPIO_Port,   MOT0_DIR_Pin,   GPIO_PIN_RESET);*/
+        if(direction == FORWARD) {
+            HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_RESET);
+        }
+        else {
+            HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_SET);
+        }
     }
     else if (motor == MOT2)
     {
-        /*if(direction == FORWARD)
-            HAL_GPIO_WritePin(MOT1_DIR_GPIO_Port,   MOT1_DIR_Pin,   GPIO_PIN_SET);
-        else
-            HAL_GPIO_WritePin(MOT1_DIR_GPIO_Port,   MOT1_DIR_Pin,   GPIO_PIN_RESET);*/
-    }
-}
-
-static void Move (enum Motor motor)
-{
-    // Run PWM
-    if(motor == MOT1)
-    {
-        HAL_TIM_PWM_Start(MOT1_TIMER, MOT2_TIMER_CHANNEL);
-    }
-    else if (motor == MOT2)
-    {
-        HAL_TIM_PWM_Start(MOT2_TIMER, MOT2_TIMER_CHANNEL);
+        if(direction == FORWARD) {
+            HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
+        }
+        else {
+            HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_SET);
+        }
     }
 }
 
@@ -181,12 +164,31 @@ static void Freewheel (enum Motor motor)
     // Disable h-bridge
     if(motor == MOT1)
     {
-        //__HAL_TIM_SET_COMPARE(MOT0_TIMER, MOT0_TIMER_CHANNEL, 0);
-        //HAL_TIM_PWM_Stop(MOT0_TIMER, MOT0_TIMER_CHANNEL);
+        HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_RESET);
+        __HAL_TIM_SET_COMPARE(MOT1_TIMER, MOT1_TIMER_CHANNEL, 0);
     }
     else if (motor == MOT2)
     {
-        //__HAL_TIM_SET_COMPARE(MOT1_TIMER, MOT1_TIMER_CHANNEL, 0);
-        //HAL_TIM_PWM_Stop(MOT1_TIMER, MOT1_TIMER_CHANNEL);
+        HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
+        __HAL_TIM_SET_COMPARE(MOT2_TIMER, MOT2_TIMER_CHANNEL, 0);
+    }
+}
+
+static void Brake (enum Motor motor)
+{
+    // Enable lower bridge to gnd braking
+    if(motor == MOT1)
+    {
+        HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_RESET);
+        __HAL_TIM_SET_COMPARE(MOT1_TIMER, MOT1_TIMER_CHANNEL, 3000);
+    }
+    else if (motor == MOT2)
+    {
+        HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
+        __HAL_TIM_SET_COMPARE(MOT2_TIMER, MOT2_TIMER_CHANNEL, 3000);
     }
 }
