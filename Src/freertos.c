@@ -52,11 +52,19 @@
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */     
+#include "main.h"
+#include "stm32f0xx_hal.h"
+#include "usart.h"
+
+#include "traces.h"
+#include "diag.h"
 
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
+osThreadId tracesTaskHandle;
+osThreadId diagTaskHandle;
 
 /* USER CODE BEGIN Variables */
 
@@ -64,6 +72,8 @@ osThreadId defaultTaskHandle;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
+void StartTracesTask(void const * argument);
+void StartDiagTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -72,6 +82,16 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 /* USER CODE END FunctionPrototypes */
 
 /* Hook prototypes */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+
+/* USER CODE BEGIN 4 */
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
+}
+/* USER CODE END 4 */
 
 /* Init FreeRTOS */
 
@@ -97,6 +117,14 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of tracesTask */
+  osThreadDef(tracesTask, StartTracesTask, osPriorityIdle, 0, 128);
+  tracesTaskHandle = osThreadCreate(osThread(tracesTask), NULL);
+
+  /* definition and creation of diagTask */
+  osThreadDef(diagTask, StartDiagTask, osPriorityIdle, 0, 128);
+  diagTaskHandle = osThreadCreate(osThread(diagTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -114,9 +142,37 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* StartTracesTask function */
+void StartTracesTask(void const * argument)
+{
+  /* USER CODE BEGIN StartTracesTask */
+  Traces_Init(&huart1);
+  /* Infinite loop */
+  for(;;)
+  {
+    //osDelay(1);
+    Traces_Process();
+  }
+  /* USER CODE END StartTracesTask */
+}
+
+/* StartDiagTask function */
+void StartDiagTask(void const * argument)
+{
+  /* USER CODE BEGIN StartDiagTask */
+  Diagnosis_Init(LED1_GPIO_Port, LED1_Pin);
+  /* Infinite loop */
+  for(;;)
+  {
+	Diagnosis_Process(xTaskGetTickCount());
+    osDelay(10);
+  }
+  /* USER CODE END StartDiagTask */
 }
 
 /* USER CODE BEGIN Application */
