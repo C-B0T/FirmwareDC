@@ -57,6 +57,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include "smbus2.h"
 
 /* USER CODE END Includes */
 
@@ -111,6 +112,10 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
+  smbus2_Init(&hsmbus1);
+
+
+  // TU TU TU TU TU TU TU TU TU TU
   HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_SET);
@@ -123,6 +128,7 @@ int main(void)
   HAL_GPIO_ReadPin(DIO2_GPIO_Port, DIO2_Pin);
   HAL_GPIO_ReadPin(DIO3_GPIO_Port, DIO3_Pin);
   HAL_GPIO_ReadPin(DIO4_GPIO_Port, DIO4_Pin);
+  // FIN TU TU TU TU TU TU TU TU TU
 
   /* USER CODE END 2 */
 

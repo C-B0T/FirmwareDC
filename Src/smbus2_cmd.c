@@ -26,8 +26,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "smbus2_cmd.h"
-
 #include "stm32f0xx_hal.h"
+#include "actions.h"
+
 
 #ifdef POWEROUT
 #endif
@@ -112,7 +113,7 @@ static uint8_t TabCmd[][3+DATA_LEN_MAX] = {
 /*----------------------------------------------------------------------------*/
 /* General Functions */
 void FunctionReset (uint8_t len, uint8_t *buff) { /* TODO Check 0x55Key */ HAL_NVIC_SystemReset(); }
-void FunctionEStop (uint8_t len, uint8_t *buff) { /* TODO ES */ }
+void FunctionEStop (uint8_t len, uint8_t *buff) { Emergency_Stop(); }
 void FunctionInit  (uint8_t len, uint8_t *buff) { /* Nothing */ }
 
 
@@ -125,6 +126,15 @@ callback_t TabCallback[] = {
 	{0x00, FunctionReset},
 	{0x01, FunctionEStop},
 	{0x03, FunctionInit},
+
+	#ifdef POWEROUT
+	/* PowerOUT */
+	{0x05, NULL},   /* Get Inputs */
+	{0x10, NULL},   /* Set Speed */
+	{0x11, NULL},   /* Set Outputs */
+	#endif
+
+	{0xFF, NULL},            /* Tab end */
 };
 
 /*----------------------------------------------------------------------------*/
@@ -266,8 +276,11 @@ void smbus2_cmd_ExecuteCmd(uint8_t cmd)
 		len  =  TabCmd[i][2];
 		buff = &TabCmd[i][3];
 
-		function.pF = TabCallback[j].pF;
-		function.pF(len, buff);
+		if(TabCallback[j].pF != NULL)
+		{
+			function.pF = TabCallback[j].pF;
+			function.pF(len, buff);
+		}
 	}
 }
 

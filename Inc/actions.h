@@ -15,6 +15,7 @@
 #ifndef INC_ACTIONS_H_
 #define INC_ACTIONS_H_
 
+void Emergency_Stop(void);
 
 
 #endif /* INC_ACTIONS_H_ */
