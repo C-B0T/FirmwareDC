@@ -107,16 +107,22 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC_Init();
   MX_I2C1_SMBUS_Init();
-  MX_TIM2_Init();
-  MX_TIM3_Init();
   MX_TIM15_Init();
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, GPIO_PIN_SET);
-//  HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_SET);
-//  HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, GPIO_PIN_SET);
+
+  //Pin PB1 soit B2 est collé au 0V
+//  HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin);
+
+  HAL_GPIO_ReadPin(DIO1_GPIO_Port, DIO1_Pin);
+  HAL_GPIO_ReadPin(DIO2_GPIO_Port, DIO2_Pin);
+  HAL_GPIO_ReadPin(DIO3_GPIO_Port, DIO3_Pin);
+  HAL_GPIO_ReadPin(DIO4_GPIO_Port, DIO4_Pin);
 
   /* USER CODE END 2 */
 
@@ -199,27 +205,6 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-/* USER CODE BEGIN Callback 0 */
-
-/* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
-/* USER CODE BEGIN Callback 1 */
-
-/* USER CODE END Callback 1 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.
