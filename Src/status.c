@@ -72,7 +72,7 @@ void Status_Process(uint32_t time)
 
 	// Update status in smbus tab
 	status = Status_GetStatus();
-	smbus2_cmd_SetData(0x04, 1U, status);
+	smbus2_cmd_SetData(0x04, 1U, &status);
 }
 
 uint8_t Status_GetStatus(void)
@@ -102,6 +102,8 @@ uint8_t Status_isBusy(void)
 
 void Status_SetBusy(uint8_t busyState)
 {
+	uint8_t status = 0;
+
 	if(busyState >= 1U)
 		_busy = 1U;
 	else
@@ -109,7 +111,7 @@ void Status_SetBusy(uint8_t busyState)
 	
 	// Update status in smbus tab
 	status = Status_GetStatus();
-	smbus2_cmd_SetData(0x04, 1U, status);
+	smbus2_cmd_SetData(0x04, 1U, &status);
 }
 
 /*----------------------------------------------------------------------------*/

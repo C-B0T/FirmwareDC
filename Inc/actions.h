@@ -15,6 +15,8 @@
 #ifndef INC_ACTIONS_H_
 #define INC_ACTIONS_H_
 
+#include "stdint.h"
+
 void Actions_Process(void);
 
 void EmergencyStop(uint8_t len, uint8_t *buff);

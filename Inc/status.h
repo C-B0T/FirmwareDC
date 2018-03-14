@@ -20,3 +20,6 @@ void Status_Process(uint32_t time);
 uint8_t Status_GetStatus(void);
 
 void Status_SetBusy(uint8_t busyState);
+
+uint8_t Status_isBusy(void);
+

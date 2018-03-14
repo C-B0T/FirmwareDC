@@ -8,6 +8,7 @@
 #include "actions.h"
 
 #include "stm32f0xx_hal.h"
+#include "smbus2_cmd.h"
 #include "status.h"
 
 /*----------------------------------------------------------------------------*/
@@ -56,7 +57,10 @@ void _stop(void)
 	HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
 }
 
-void _ontrol_S_AU(void);
+void _control_S_AU(void)
+{
+
+}
 
 /*----------------------------------------------------------------------------*/
 /* Implementation                                                             */
@@ -106,13 +110,13 @@ void SetOutput(uint8_t len, uint8_t *buff)
 	else
 		state = GPIO_PIN_SET;
 	
-	if( ((unit == 0x01 || (unit == 0x0A)) && (subunit == 0x01) )
+	if( ((unit == 0x01) || (unit == 0x0A)) && (subunit == 0x01) )
 		HAL_GPIO_WritePin(A1_GPIO_Port, A1_Pin, state);
-	else if( ((unit == 0x02 || (unit == 0x0B)) && (subunit == 0x01) )
+	else if( ((unit == 0x02) || (unit == 0x0B)) && (subunit == 0x01) )
 		HAL_GPIO_WritePin(B1_GPIO_Port, B1_Pin, state);
-	else if( ((unit == 0x01 || (unit == 0x0A)) && (subunit == 0x02) )
+	else if( ((unit == 0x01) || (unit == 0x0A)) && (subunit == 0x02) )
 		HAL_GPIO_WritePin(A2_GPIO_Port, A2_Pin, state);
-	else if( ((unit == 0x02 || (unit == 0x0B)) && (subunit == 0x02) )
+	else if( ((unit == 0x02) || (unit == 0x0B)) && (subunit == 0x02) )
 		HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, state);
 
 	Status_SetBusy(false);
