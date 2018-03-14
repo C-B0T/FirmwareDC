@@ -27,10 +27,10 @@
 
 #include "smbus2_cmd.h"
 #include "stm32f0xx_hal.h"
-#include "actions.h"
 
 
 #ifdef POWEROUT
+#include "actions.h"
 #endif
 #ifdef STEPPER
 #endif
@@ -50,6 +50,8 @@
 #define WR (1U)
 #define RD (2U)
 
+#define KEY_55	(0x55)
+
 #define DATA_LEN_MAX (4)
 
 /*----------------------------------------------------------------------------*/
@@ -60,10 +62,10 @@
 static uint8_t TabCmd[][3+DATA_LEN_MAX] = {
 
 	/* General */
-	{0x00, WR, 1, 0x55},     /* Reset */
-	{0x01, WR, 1, 0x55},     /* Emergency Stop */
+	{0x00, WR, 1, KEY_55},   /* Reset */
+	{0x01, WR, 1, KEY_55},   /* Emergency Stop */
 	{0x02, RD, 1, 0xAA},     /* Ping */
-	{0x03, WR, 1, 0x55},     /* Init */
+	{0x03, WR, 1, KEY_55},   /* Init */
 	{0x04, RD, 1, 0x00},     /* Status */
 
 	#ifdef POWEROUT
@@ -112,8 +114,7 @@ static uint8_t TabCmd[][3+DATA_LEN_MAX] = {
 /* Callback                                                                   */
 /*----------------------------------------------------------------------------*/
 /* General Functions */
-void FunctionReset (uint8_t len, uint8_t *buff) { /* TODO Check 0x55Key */ HAL_NVIC_SystemReset(); }
-void FunctionEStop (uint8_t len, uint8_t *buff) { Emergency_Stop(); }
+void FunctionReset (uint8_t len, uint8_t *buff) { if(buff[0] == KEY_55) HAL_NVIC_SystemReset(); }
 void FunctionInit  (uint8_t len, uint8_t *buff) { /* Nothing */ }
 
 
@@ -124,26 +125,32 @@ typedef struct callback {
 
 callback_t TabCallback[] = {
 	{0x00, FunctionReset},
-	{0x01, FunctionEStop},
+	{0x01, EmergencyStop},
 	{0x03, FunctionInit},
 
 	#ifdef POWEROUT
 	/* PowerOUT */
-	{0x05, NULL},   /* Get Inputs */
-	{0x10, NULL},   /* Set Speed */
-	{0x11, NULL},   /* Set Outputs */
+	{0x10, SetSpeed},    /* Set Speed */
+	{0x11, SetOutput},   /* Set Outputs */
 	#endif
 
-	{0xFF, NULL},            /* Tab end */
+	#ifdef STEPPER
+	/* Stepper */
+	{0x10, NULL},        /* Set Mode */
+	{0x11, NULL},        /* Set Speed */
+	{0x12, NULL},        /* Set acc/dec */
+	{0x13, NULL},        /* Do steps */
+	{0x14, NULL},        /* Go */
+	{0x15, NULL},        /* Stop */
+	#endif
+
+	{0xFF, NULL},        /* Tab end */
 };
 
 /*----------------------------------------------------------------------------*/
 /* Private                                                                    */
 /*----------------------------------------------------------------------------*/
 
-static uint8_t LastCmd = 0xFF;
-
-static uint8_t NewCmdWR = 0xFF;
 
 /*----------------------------------------------------------------------------*/
 /* Implementation                                                             */
@@ -235,25 +242,7 @@ uint8_t smbus2_cmd_SetData(uint8_t cmd, uint8_t len, uint8_t *buff)
 	for(j=0 ; (j < len) || (j<DATA_LEN_MAX) ; j++)
 		TabCmd[i][3+j] = buff[j];
 
-	LastCmd = cmd;
-
 	return j;
-}
-
-void smbus2_cmd_SetNewCmdWR(uint8_t cmd)
-{
-	NewCmdWR = cmd;
-}
-
-uint8_t smbus2_cmd_GetCmdToExecute(void)
-{
-	uint8_t cmd;
-
-	cmd = NewCmdWR;
-	// Cmd can be lost here...
-	NewCmdWR = 0xFF;
-
-	return cmd;
 }
 
 void smbus2_cmd_ExecuteCmd(uint8_t cmd)

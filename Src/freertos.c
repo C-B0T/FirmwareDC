@@ -57,7 +57,7 @@
 #include "usart.h"
 
 #include "traces.h"
-#include "diag.h"
+#include "status.h"
 
 /* USER CODE END Includes */
 
@@ -165,11 +165,11 @@ void StartTracesTask(void const * argument)
 void StartDiagTask(void const * argument)
 {
   /* USER CODE BEGIN StartDiagTask */
-  Diagnosis_Init(LED1_GPIO_Port, LED1_Pin);
+  Status_Init(LED1_GPIO_Port, LED1_Pin);
   /* Infinite loop */
   for(;;)
   {
-	Diagnosis_Process(xTaskGetTickCount());
+	Status_Process(xTaskGetTickCount());
     osDelay(10);
   }
   /* USER CODE END StartDiagTask */

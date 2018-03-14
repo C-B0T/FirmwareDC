@@ -15,7 +15,13 @@
 #ifndef INC_ACTIONS_H_
 #define INC_ACTIONS_H_
 
-void Emergency_Stop(void);
+void Actions_Process(void);
+
+void EmergencyStop(uint8_t len, uint8_t *buff);
+
+void SetSpeed(uint8_t len, uint8_t *buff);
+
+void SetOutput(uint8_t len, uint8_t *buff);
 
 
 #endif /* INC_ACTIONS_H_ */

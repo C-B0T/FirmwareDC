@@ -21,10 +21,6 @@ uint8_t smbus2_cmd_GetData(uint8_t cmd, uint8_t *buff);
 
 uint8_t smbus2_cmd_SetData(uint8_t cmd, uint8_t len, uint8_t *buff);
 
-void smbus2_cmd_SetNewCmdWR(uint8_t cmd);
-
-uint8_t smbus2_cmd_GetCmdToExecute(void);
-
 void smbus2_cmd_ExecuteCmd(uint8_t cmd);
 
 

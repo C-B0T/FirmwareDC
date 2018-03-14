@@ -134,7 +134,7 @@ void HAL_SMBUS_SlaveRxCpltCallback(SMBUS_HandleTypeDef *hsmbus)
 		cmd  = buff[0];
 		size = buff[1];
 		smbus2_cmd_SetData(cmd, size, &buff[2]);
-		smbus2_cmd_SetNewCmdWR(cmd);
+		smbus2_cmd_ExecuteCmd(cmd);
 		state = STATE_0_IDLE;
 	}
 	else
