@@ -85,6 +85,10 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  extern char end asm("end");
+  extern char estack asm("_estack");
+  static char *heap_start = &end;
+  static char *ram_end = &estack;
 
   /* USER CODE END 1 */
 
@@ -129,6 +133,12 @@ int main(void)
   HAL_GPIO_ReadPin(DIO3_GPIO_Port, DIO3_Pin);
   HAL_GPIO_ReadPin(DIO4_GPIO_Port, DIO4_Pin);
   // FIN TU TU TU TU TU TU TU TU TU
+
+
+  // Welcome
+  printf("FirmwareDC (" __DATE__ " - " __TIME__ ")\r\n");
+  printf("  heap_start = %p\r\n", heap_start);
+  printf("  ram_end    = %p\r\n", ram_end);
 
   /* USER CODE END 2 */
 

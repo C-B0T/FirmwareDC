@@ -155,7 +155,7 @@ void StartTracesTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    //osDelay(1);
+    osDelay(1);
     Traces_Process();
   }
   /* USER CODE END StartTracesTask */

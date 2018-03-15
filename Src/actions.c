@@ -94,6 +94,7 @@ void SetOutput(uint8_t len, uint8_t *buff)
 {
 	uint8_t unit    = buff[0];
 	uint8_t subunit = buff[1];
+	uint8_t val     = buff[2];
 	
 	GPIO_PinState state = GPIO_PIN_RESET;
 
@@ -105,7 +106,7 @@ void SetOutput(uint8_t len, uint8_t *buff)
 
 	Status_SetBusy(true);
 	
-	if(buff[2] == 0x00)
+	if(val == 0x00)
 		state = GPIO_PIN_RESET;
 	else
 		state = GPIO_PIN_SET;
