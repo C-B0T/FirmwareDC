@@ -6,7 +6,12 @@
  */
 
 #include "status.h"
-#include "smbus2_cmd.h"
+
+// status falgs :
+// b7 to b2 : always 0
+// b1 : error
+// b0 : busy
+uint8_t status[1] = {0};
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -52,7 +57,6 @@ void Status_Process(uint32_t time)
     
     uint16_t local_time = 0;
     uint16_t period = 0;
-	uint8_t status = 0;
     
     local_time = time - t0;
     
@@ -62,20 +66,16 @@ void Status_Process(uint32_t time)
     else
         period = STATUS_PERIOD_OKAY;
 
-	if(local_time <= period/2U)
-		HAL_GPIO_WritePin(_GPIOx, _GPIO_Pin, GPIO_PIN_SET);
-	else
-		HAL_GPIO_WritePin(_GPIOx, _GPIO_Pin, GPIO_PIN_RESET);
+    if(local_time <= period/2U)
+        HAL_GPIO_WritePin(_GPIOx, _GPIO_Pin, GPIO_PIN_SET);
+    else
+        HAL_GPIO_WritePin(_GPIOx, _GPIO_Pin, GPIO_PIN_RESET);
 
     if(local_time >= period)
         t0 = time;
-
-	// Update status in smbus tab
-	status = Status_GetStatus();
-	smbus2_cmd_SetData(0x04, 1U, &status);
 }
 
-uint8_t Status_GetStatus(void)
+uint8_t Status_GetGlobalStatus(void)
 {
 	uint8_t status = 0;
 
@@ -87,34 +87,4 @@ uint8_t Status_GetStatus(void)
 	
 	return status;
 }
-
-uint8_t Status_isBusy(void)
-{
-	uint8_t busy = false;
-
-	if(_busy >= 1U)
-		busy = true;
-	else
-		busy = false;
-
-	return busy;
-}
-
-void Status_SetBusy(uint8_t busyState)
-{
-	uint8_t status = 0;
-
-	if(busyState >= 1U)
-		_busy = 1U;
-	else
-		_busy = 0U;
-	
-	// Update status in smbus tab
-	status = Status_GetStatus();
-	smbus2_cmd_SetData(0x04, 1U, &status);
-}
-
-/*----------------------------------------------------------------------------*/
-/* Callbacks                                                                  */
-/*----------------------------------------------------------------------------*/
 

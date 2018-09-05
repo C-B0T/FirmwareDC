@@ -13,6 +13,4 @@
 
 void smbus2_Init(SMBUS_HandleTypeDef *h);
 
-void smbus2_Process(void);
-
 #endif /* INC_SMBUS2_H_ */
