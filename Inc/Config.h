@@ -15,10 +15,6 @@
 #define CONF_INPUT			(1U)
 #define CONF_OUTPUT			(2U)
 //#define CONF_PWM			(3U)
-#define CONF_SERVO_GENERIC	(4U)
-#define CONF_SERVO_GOTECK	(5U)
-#define CONF_SERVO_FUTABA	(6U)
-#define CONF_SHARP			(7U)
 
 
 /*----------------------------------------------------------------------------*/

@@ -20,7 +20,6 @@
 enum dio {DIO1 = 1, DIO2, DIO3, DIO4};
 
 void dio_Init (void);
-uint8_t dio_GetConfig(uint8_t *conf, uint8_t len);
 
 void dio_Disable (void);
 

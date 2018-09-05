@@ -12,7 +12,7 @@
 
 #include "dio.h"
 
-#define INPUTS_LEN	(2)
+#define INPUTS_LEN	(4)
 
 // Table has direct access to optimize time access during SMBUS READ Command
 //extern uint8_t inputs_raw[INPUTS_LEN];
