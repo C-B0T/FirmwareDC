@@ -129,7 +129,7 @@ int main(void)
 
   //Pin PB1 soit B2 est collé au 0V
 //  HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_SET);
-  HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin);
+  volatile GPIO_PinState b2 = HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin);
 
   HAL_GPIO_ReadPin(DIO1_GPIO_Port, DIO1_Pin);
   HAL_GPIO_ReadPin(DIO2_GPIO_Port, DIO2_Pin);
